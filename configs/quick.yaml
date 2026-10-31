@@ -1,0 +1,82 @@
+# Compact smoke configuration: fast artifact sanity check (still fully offline).
+world:
+  width: 30
+  height: 30
+  sensor_range: 5
+  obstacle_density: { easy: 0.10, medium: 0.18, hard: 0.25 }
+  hazard_density: { easy: 0.03, medium: 0.06, hard: 0.10 }
+  trap_cluster_presets_per_difficulty: 3
+  min_start_goal_distance_fraction: 0.55
+  traversable_includes_hazard: true
+
+rover:
+  initial_battery: 1.0
+  battery_reserve: 0.05
+  max_steps: 200
+  max_consecutive_stops: 4
+  stuck_window: 8
+  stuck_displacement_epsilon: 0.75
+  stuck_min_new_cells: 1          # [NEW] stuck == no progress AND <= N newly discovered cells in the window
+  energy_capacity: 120.0
+  energy_cost:
+    MOVE_FORWARD: 1.0
+    TURN_LEFT_AND_MOVE: 1.3
+    TURN_RIGHT_AND_MOVE: 1.3
+    REVERSE: 1.5
+    STOP_AND_REPLAN: 0.1
+  hazard_energy_multiplier: 1.8
+  hazard_stall_probability: { easy: 0.10, medium: 0.15, hard: 0.20 }
+  episode_wall_clock_timeout_s: 60.0
+
+agent:
+  mode: mock_laya
+  confidence_threshold: 0.70
+  decision_timeout_ms: 1200
+  retry_count: 0
+  mock_laya_profile:
+    agree_with_fallback_pct: 0.80
+    ambiguous_alt_pct: 0.10
+    low_confidence_or_invalid_pct: 0.10
+    unsafe_proposal_pct: 0.05
+    malformed_share_of_invalid: 0.20
+  laya_api:
+    # A self-hosted `laya-serve` on the rover's own host. No key by default:
+    # the server only requires one if IT was started with LAYA_API_KEY.
+    endpoint: http://127.0.0.1:8000/v1/systemone
+    model: english                      # english | multilingual | typed-decisions | auto
+    request_timeout_s: 5.0              # local host, but a cold checkpoint load is slow
+    max_retries: 1                      # ride out one 503 "busy" answer
+    max_concurrent_requests: 4
+    auth_required: false                # true when the server sets LAYA_API_KEY
+    auth_header: Authorization
+    auth_scheme: Bearer
+
+controllers:
+  fallback:
+    dead_end_avoidance: true      # [NEW] conservative net must not copy the greedy baseline
+    dead_end_clearance_threshold: 3   # a wall within N cells ahead reads as a shallow pocket
+    hazard_aversion_margin: 0.75
+    pocket_penalty: 3.0           # accept up to +3 cells of detour to stay out of a visible pocket
+    memory_cells: 12
+    backtrack_penalty: 2.0        # never immediately undo the previous move
+    escape_window: 6              # cycling is detected from the rover's own recent poses
+    escape_max_distinct: 4
+    escape_multiplier: 3.0        # ...and then visited cells are penalised 3x harder
+    memory_penalty: 2.5           # outbids a 1-2 cell distance gain from re-entering a pocket
+    memory_floor_fraction: 0.5
+
+guardian:
+  mode: enforced
+
+experiment:
+  seeds_per_difficulty: 6
+  difficulties: [easy, medium, hard]
+  controllers: [laya_agent, baseline]
+  confidence_thresholds: [0.60, 0.70, 0.80]
+  laya_api_confirmatory_seeds: 5
+  output_dir: outputs_quick
+  jobs: 2
+  rng_streams:
+    map_generation: independent
+    hazard_stalls: independent
+    mock_laya_confidence: independent

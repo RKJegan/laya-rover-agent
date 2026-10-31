@@ -1,0 +1,7 @@
+agent:
+  decision_timeout_ms: 8000.0
+  laya_api:
+    request_timeout_s: 12.0
+
+guardian:
+  mode: log_only_ablation

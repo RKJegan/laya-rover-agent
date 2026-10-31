@@ -1,0 +1,136 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Tests: all offline (no network)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests", "-q", "--strict-markers"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Tests: current file",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["${relativeFile}", "-q"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Tests: only tests whose name matches the selection",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests", "-q", "-k", "${selectedText}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "CLI: episode trace (easy / trap_u / seed 0)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "laya_rover_agent",
+      "args": [
+        "episode",
+        "--config", "configs/quick.yaml",
+        "--seed", "0",
+        "--difficulty", "easy",
+        "--preset", "trap_u",
+        "--controller", "laya_agent",
+        "--max-rows", "40",
+        "--log-jsonl", "outputs/vscode_episode.jsonl"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "CLI: experiment (quick config, 4 seeds)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "laya_rover_agent",
+      "args": [
+        "experiment",
+        "--config", "configs/quick.yaml",
+        "--mode", "mock_laya",
+        "--seeds", "4",
+        "--run-label", "vscode"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "CLI: full sweep (30 seeds x 3 difficulties x 3 thresholds)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "laya_rover_agent",
+      "args": [
+        "experiment",
+        "--config", "configs/default.yaml",
+        "--mode", "mock_laya",
+        "--run-label", "full-mock"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Hardware: virtual simulator mission (no key needed)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "laya_rover_agent",
+      "args": [
+        "hardware",
+        "--config", "configs/quick.yaml",
+        "--backend", "sim",
+        "--preset", "trap_u",
+        "--difficulty", "easy",
+        "--seed", "0",
+        "--controller", "laya_agent",
+        "--log", "outputs/vscode_hw_mission.jsonl"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Live Laya: smoke test, health probe + 1 real decision",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/smoke_test_laya_api.py",
+      "args": ["--show-raw"],
+      "envFile": "${workspaceFolder}/.env",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Live Laya: 2 live episodes (needs laya-serve running)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/smoke_test_laya_api.py",
+      "args": ["--episodes", "2", "--preset", "trap_u", "--difficulty", "medium"],
+      "envFile": "${workspaceFolder}/.env",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    },
+    {
+      "name": "Live Laya: offline rehearsal (no server needed)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/smoke_test_laya_api.py",
+      "args": ["--offline", "--episodes", "2"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ]
+}

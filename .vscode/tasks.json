@@ -1,0 +1,100 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "setup: install editable + dev extras",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m pip install -e \".[dev]\"",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "test: offline suite (layers 1-3)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m pytest -q",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "test: coverage report",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m pytest -q --cov=laya_rover_agent --cov-report=term-missing --cov-report=html:outputs/coverage",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "run: episode trace",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m laya_rover_agent episode --config configs/quick.yaml --seed 0 --difficulty easy --preset trap_u --controller laya_agent",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "run: experiment (quick)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m laya_rover_agent experiment --config configs/quick.yaml --mode mock_laya --seeds 4 --run-label vscode",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "run: experiment (full sweep)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m laya_rover_agent experiment --config configs/default.yaml --mode mock_laya --run-label full-mock",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "run: hardware mission (simulator backend)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m laya_rover_agent hardware --config configs/quick.yaml --backend sim --preset trap_u --difficulty easy --seed 0 --log outputs/vscode_hw_mission.jsonl",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "run: estimate live decision volume",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m laya_rover_agent estimate --config configs/default.yaml",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "check: laya-serve pre-flight (/health)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} scripts/smoke_test_laya_api.py --health-only",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "check: no secret material in outputs",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} scripts/check_no_secrets.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

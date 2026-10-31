@@ -1,0 +1,22 @@
+# Secrets - never commit
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.venv-agent/
+.venv-server/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+build/
+dist/
+
+# Run artifacts
+outputs/
+outputs_quick/
+*.jsonl
+!tests/fixtures/*.jsonl

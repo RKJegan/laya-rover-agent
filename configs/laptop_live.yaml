@@ -1,0 +1,27 @@
+# Laya Rover Agent - "slow laptop" live profile.
+#
+# Layer this ON TOP of configs/default.yaml when the real Laya model runs on a
+# CPU-only laptop and the default decision budget is too tight for it:
+#
+#     python -m laya_rover_agent episode --config configs/laptop_live.yaml --mode laya_api ...
+#     python scripts/smoke_test_laya_api.py --config configs/laptop_live.yaml --show-raw
+#
+# Why it is needed: the decision budget is a hard ceiling -
+# effective timeout = min(request_timeout_s, decision_timeout_ms / 1000) - and
+# the shipped 1200 ms is sized for a GPU or a warm, fast CPU. A cold or slow
+# machine needs more time per decision, and without it EVERY step is cancelled
+# and silently falls back (guardian_reason_code DECISION_TIMEOUT, action_source
+# fallback). The rover stays safe either way; it just never gets to use the
+# model's answer.
+#
+# Tune it down afterwards: read latency_mean_ms and latency_p95_ms in the
+# episode summary and set decision_timeout_ms to roughly twice the p95.
+#
+# NOTE: this is a testing convenience. On a real rover the decision budget is a
+# safety parameter - the rover must not sit still indefinitely - so keep it as
+# tight as the hardware honestly allows (see docs/HARDWARE_DEPLOYMENT.md).
+
+agent:
+  decision_timeout_ms: 8000.0        # was 1200 - generous for a slow CPU laptop
+  laya_api:
+    request_timeout_s: 12.0          # was 5.0 - must be >= decision_timeout_ms / 1000
